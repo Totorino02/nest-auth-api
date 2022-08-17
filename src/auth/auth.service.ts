@@ -45,8 +45,8 @@ export class AuthService{
     async register(dto : CreateUserDto){
         const hash = await argon.hash(dto.password)
         const user_ = {
-            nom : dto.nom,
-            prenom : dto.prenom,
+            firstname : dto.firstname,
+            lastname : dto.lastname,
             email: dto.email,
             password: hash,
             image : dto.image   
@@ -59,8 +59,8 @@ export class AuthService{
                 data: user_ ,
                 select: {
                     id: true,
-                    nom: true,
-                    prenom: true,
+                    firstname: true,
+                    lastname: true,
                     email: true,
                     isAdmin: true,
                     isConfirm: true

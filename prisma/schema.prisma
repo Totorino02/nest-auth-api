@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
 
@@ -12,9 +9,9 @@ datasource db {
 }
 
 model User {
-  id               Int             @id @default(autoincrement())
-  nom              String?
-  prenom           String?
+  id               BigInt             @id @default(autoincrement())
+  firstname              String?
+  lastname           String?
   email            String             @unique
   password         String
   isAdmin          Boolean            @default(false)
@@ -28,10 +25,10 @@ model User {
 }
 
 model UserConfirmation {
-  id       Int   @id @default(autoincrement())
-  userId   Int
-  user     User     @relation(fields: [userId], references: [id])
+  id       BigInt   @id @default(autoincrement())
+  userId   BigInt
   expireAt DateTime
+  user     User     @relation(fields: [userId], references: [id])
 
   @@map("userConfirmations")
 }
