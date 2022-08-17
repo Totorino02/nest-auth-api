@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { AuthDto, LoginDto } from "./dto";
+import { CreateUserDto, LoginUserDto } from "./dto";
 import * as argon from "argon2";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
@@ -13,7 +13,7 @@ export class AuthService{
      * @param login 
      * @returns User
      */
-    async login(login : LoginDto){
+    async login(login : LoginUserDto){
 
         const user = await this.prisma.user.findUnique({
             where: {
@@ -27,7 +27,7 @@ export class AuthService{
             return {};
         }
 
-        // check th password
+        // check the password
         const pwMatches = await argon.verify(user.password, login.password);
 
         if(!pwMatches){
@@ -42,7 +42,7 @@ export class AuthService{
      * @param dto 
      * @returns User
      */
-    async register(dto : AuthDto){
+    async register(dto : CreateUserDto){
         const hash = await argon.hash(dto.password)
         const user_ = {
             nom : dto.nom,

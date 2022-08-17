@@ -1,2 +1,2 @@
-export * from "./auth.dto"
-export * from "./login.sto"
+export * from "./createUser.dto"
+export * from "./loginUser.dto"
