@@ -3,19 +3,30 @@ import { CreateUserDto, LoginUserDto } from "./dto";
 import * as argon from "argon2";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { User } from "@prisma/client";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthService{
-    constructor(private prisma : PrismaService){}
+    constructor(
+        private prisma : PrismaService,
+        private jwt: JwtService
+    ){}
+
+    signToken(userId: any, email: string): Promise<string>
+    {
+        const payload = {userId, email};
+        return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, expiresIn: "1h"});
+    }
 
     /**
      * Login with user credentials, if success return the user
      * @param login 
-     * @returns User
+     * @returns {string, User}
      */
     async login(login : LoginUserDto){
-
-        const user = await this.prisma.user.findUnique({
+        let user : User;
+        user = await this.prisma.user.findUnique({
             where: {
                 email: login.email
             }
@@ -34,7 +45,9 @@ export class AuthService{
             throw new ForbiddenException("Email or password invalid");
         }
 
-        return user;
+        const token = await this.signToken(user.id, user.email)
+
+        return { _access_token: token, _user: user};
     }
 
     /**
