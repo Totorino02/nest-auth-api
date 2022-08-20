@@ -1,0 +1,1 @@
+`${value} ma super valeur`

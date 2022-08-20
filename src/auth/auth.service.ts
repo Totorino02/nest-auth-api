@@ -16,9 +16,10 @@ export class AuthService{
     signToken(userId: any, email: string): Promise<string>
     {
         const payload = {userId, email};
-        return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, expiresIn: "1h"});
+        return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, expiresIn: "6h"});
     }
 
+    
     /**
      * Login with user credentials, if success return the user
      * @param login 

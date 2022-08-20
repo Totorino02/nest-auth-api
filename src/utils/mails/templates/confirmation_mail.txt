@@ -1,0 +1,7 @@
+<div>
+    <p>Hi ${name},</p>
+    <p>To verify your email address(${email}), please click the link following <a href="${link}">here</a>.</p>
+    <p>If you believe you received thi email this error, please contact us at <a href="mailto:${support_email}">${support_email}</a></p>
+    <p>Thank you.</p>
+    <p>The Toptal Team</p>
+</div>

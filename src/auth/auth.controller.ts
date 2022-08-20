@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { Request } from "express";
 import { FormDataRequest } from "nestjs-form-data";
+import { Mailer } from "src/utils";
 import { AuthService } from "./auth.service";
 import { CreateUserDto, LoginUserDto } from "./dto";
 
@@ -23,6 +24,8 @@ export class AuthController{
     @Get("all")
     @UseGuards(AuthGuard("jwt"))
     users(@Req() req: Request){
+        let mailer = new Mailer();
+        mailer.confirmationMail(req.user);
         return this.service.allUser();
     }
 
