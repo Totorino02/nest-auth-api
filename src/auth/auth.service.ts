@@ -5,6 +5,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { User } from "@prisma/client";
 import { JwtService } from "@nestjs/jwt";
+import { networkInterfaces } from "os";
 
 @Injectable()
 export class AuthService{
@@ -16,10 +17,45 @@ export class AuthService{
     signToken(userId: any, email: string): Promise<string>
     {
         const payload = {userId, email};
-        return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, expiresIn: "6h"});
+        return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, /* expiresIn: "6h" */});
     }
 
+    async accountConfirmation(_user : User){
+        const token = await this.signToken(_user.id, _user.email);
+        
+        let expireAt = new Date();
+        expireAt.setDate(expireAt.getTime()+ 24*3600);
+
+        try {
+            /* this.prisma.userConfirmation.deleteMany({
+                where: {
+                    userId: _user.id
+                }
+            }) */
     
+            const confirmationAccount = await this.prisma.userConfirmation.create({
+                data: {
+                    userId: _user.id,
+                    expireAt: expireAt
+                }
+            })
+
+            return confirmationAccount;
+
+        } catch (error) {
+            if( error instanceof PrismaClientKnownRequestError){
+                console.log(error)
+                throw new ForbiddenException('an error occur where creating your account. Please contact thr technical support for assistance');
+            }
+            throw error;
+        }
+
+
+
+
+    }
+
+
     /**
      * Login with user credentials, if success return the user
      * @param login 
@@ -66,27 +102,24 @@ export class AuthService{
             image : dto.image   
         }
 
-        try {
+        console.log(dto)
 
-
+        try {  
             const user = await this.prisma.user.create({
                 data: user_ ,
-                select: {
-                    id: true,
-                    firstname: true,
-                    lastname: true,
-                    email: true,
-                    isAdmin: true,
-                    isConfirm: true
-                }
-            })      
-            return user;        
+            });
+            
+            const confirmationAccount = this.accountConfirmation(user);
+            return confirmationAccount;  
+    
         } catch (error) {
             if( error instanceof PrismaClientKnownRequestError){
-                throw new ForbiddenException('crédential taken')
+                throw new ForbiddenException('crédential taken');
             }
             throw error;
         }
+
+        
     }
 
     async allUser(){
