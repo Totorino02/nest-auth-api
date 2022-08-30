@@ -3,7 +3,7 @@ import { AuthGuard } from "@nestjs/passport";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { FormDataRequest } from "nestjs-form-data";
-import { Mailer } from "src/utils";
+import { Mailer } from "src/utils/mails";
 import { FileSaver } from "src/utils/files";
 import { AuthService } from "./auth.service";
 import { CreateUserDto, LoginUserDto } from "./dto";
@@ -35,8 +35,13 @@ export class AuthController{
     @UseGuards(AuthGuard("jwt"))
     users(@Req() req: Request){
         let mailer = new Mailer();
-        mailer.confirmationMail(req.user);
+        //mailer.confirmationMail(req.user);
         return this.service.allUser();
     };
+
+    @Get("justTest")
+    justTest(@Body() data: any){
+        return this.justTest(data);
+    }
 
 }

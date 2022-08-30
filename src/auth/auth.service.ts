@@ -3,7 +3,7 @@ import { CreateUserDto, LoginUserDto } from "./dto";
 import * as argon from "argon2";
 import { PrismaService } from "src/prisma/prisma.service";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
-import { User } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import { JwtService } from "@nestjs/jwt";
 import { networkInterfaces } from "os";
 
@@ -20,7 +20,15 @@ export class AuthService{
         return this.jwt.signAsync(payload, {secret: process.env.JWT_SECRET, /* expiresIn: "6h" */});
     }
 
-    async accountConfirmation(_user : User){
+    async createConfirmation(_user : Prisma.UserConfirmationUncheckedCreateInput){
+        const confirmationAccount = await this.prisma.userConfirmation.create({
+            data: _user
+        })
+
+        return confirmationAccount;
+    }
+
+    async accountConfirmation(_user: User){
         const token = await this.signToken(_user.id, _user.email);
         
         let expireAt = new Date();
@@ -33,15 +41,8 @@ export class AuthService{
                 }
             }) */
     
-            const confirmationAccount = await this.prisma.userConfirmation.create({
-                data: {
-                    userId: _user.id,
-                    expireAt: expireAt
-                }
-            })
-
+            const confirmationAccount = this.createConfirmation({userId: 1/* _user.id */, expireAt: expireAt });
             return confirmationAccount;
-
         } catch (error) {
             if( error instanceof PrismaClientKnownRequestError){
                 console.log(error)
@@ -53,6 +54,21 @@ export class AuthService{
 
 
 
+    }
+
+    async justTest(data: any){
+        let expireAt = new Date();
+        expireAt.setDate(expireAt.getTime()+ 24*3600);
+        try {
+            return await this.prisma.userConfirmation.create({
+                data:{
+                    expireAt: expireAt,
+                    userId: data.userId
+                }// 
+            });
+        } catch (error) {
+            console.log(error)
+        }
     }
 
 
